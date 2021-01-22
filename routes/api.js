@@ -19,7 +19,7 @@ router.post('/get', async function(req, res, next) {
 });
 
 router.post('/set', async function(req, res, next) {
-    const data = await tateManager.setData(req.body);
+    const data = await stateManager.setData(req.body);
     res.json(data);
 });
 

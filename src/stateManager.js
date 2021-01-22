@@ -14,9 +14,6 @@ const StateManager = class {
     }
 
     async _changeCurrency(oldCurrency) {
-        if (this.#currentData === null)
-            return null;
-
         const exchangeRate = await currencyManager.convert(oldCurrency, this.#currentData.currency);
 
         for (const key of StateManager.#ALL_KEYS) {
@@ -28,10 +25,12 @@ const StateManager = class {
     }
 
     async setData(newData) {
-        let oldCurrency;
+        if (this.#currentData === null) {
+            this.#currentData = newData;
+            return this._recalculate();
+        }
 
-        if (this.#currentData !== null)
-            oldCurrency = this.#currentData.currency;
+        const oldCurrency = this.#currentData.currency;
 
         this.#currentData = newData;
 

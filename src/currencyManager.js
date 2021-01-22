@@ -1,13 +1,13 @@
 const https = require('https');
 
 const CurrencyManager = class {
-    #data = null;
-    #expiryTime = 0;
-    #waitQueue = [];
-    #busy = false;
+    _data = null;
+    _expiryTime = 0;
+    _waitQueue = [];
+    _busy = false;
 
     async _refreshData() {
-        this.#busy = true;
+        this._busy = true;
 
         try {
             const data = await new Promise((resolve, reject) => {
@@ -31,32 +31,32 @@ const CurrencyManager = class {
                 req.end();
             });
 
-            this.#data = JSON.parse(data);
-            this.#expiryTime = Date.now() + 5 * 60 * 1000; // 5 minutes
+            this._data = JSON.parse(data);
+            this._expiryTime = Date.now() + 5 * 60 * 1000; // 5 minutes
         } finally {
-            this.#busy = false;
+            this._busy = false;
 
-            while (this.#waitQueue.length > 0) {
-                const resolver = this.#waitQueue.pop();
+            while (this._waitQueue.length > 0) {
+                const resolver = this._waitQueue.pop();
                 resolver();
             }
         }
     }
 
     async _convert(from, to) {
-        if (this.#expiryTime < Date.now()) {
+        if (this._expiryTime < Date.now()) {
             console.log('Updating currency rates...');
 
-            if (this.#busy) {
+            if (this._busy) {
                 await new Promise((resolve) => {
-                    this.#waitQueue.push(resolve);
+                    this._waitQueue.push(resolve);
                 });
             } else {
                 await this._refreshData();
             }
         }
 
-        return this.#data.rates[to] / this.#data.rates[from];
+        return this._data.rates[to] / this._data.rates[from];
     }
 
     async convert(from, to) {

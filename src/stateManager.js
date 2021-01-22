@@ -1,14 +1,14 @@
 const currencyManager = require("./currencyManager");
 
 const StateManager = class {
-    static #ALL_KEYS = ['cashAndInvestments', 'longTermAssets', 'shortTermLiabilities', 'longTermDebt'];
+    static _ALL_KEYS = ['cashAndInvestments', 'longTermAssets', 'shortTermLiabilities', 'longTermDebt'];
 
-    #currentData = null;
+    _currentData = null;
 
     _recalculate() {
         const sums = {};
-        for (const key of StateManager.#ALL_KEYS)
-            sums[key] = this.#currentData[key].map(x => x[1]).reduce((acc, curr) => acc + curr);
+        for (const key of StateManager._ALL_KEYS)
+            sums[key] = this._currentData[key].map(x => x[1]).reduce((acc, curr) => acc + curr);
 
         const totalAssets = sums.cashAndInvestments + sums.longTermAssets;
         const totalLiabilities = sums.shortTermLiabilities + sums.longTermDebt;
@@ -21,10 +21,10 @@ const StateManager = class {
     }
 
     async _changeCurrency(oldCurrency) {
-        const exchangeRate = await currencyManager.convert(oldCurrency, this.#currentData.currency);
+        const exchangeRate = await currencyManager.convert(oldCurrency, this._currentData.currency);
 
-        for (const key of StateManager.#ALL_KEYS) {
-            this.#currentData[key] = this.#currentData[key].map(entry => {
+        for (const key of StateManager._ALL_KEYS) {
+            this._currentData[key] = this._currentData[key].map(entry => {
                 entry[1] *= exchangeRate;
                 return entry;
             });
@@ -32,32 +32,32 @@ const StateManager = class {
     }
 
     async setData(newData) {
-        if (this.#currentData === null) {
-            this.#currentData = newData;
+        if (this._currentData === null) {
+            this._currentData = newData;
             return {
-                model: this.#currentData,
+                model: this._currentData,
                 data: this._recalculate(),
             };
         }
 
-        const oldCurrency = this.#currentData.currency;
+        const oldCurrency = this._currentData.currency;
 
-        this.#currentData = newData;
+        this._currentData = newData;
 
         if (oldCurrency && oldCurrency !== newData.currency)
             await this._changeCurrency(oldCurrency);
 
         return {
-            model: this.#currentData,
+            model: this._currentData,
             data: this._recalculate(),
         };
     }
 
     async getData(defaultData) {
-        if (this.#currentData === null)
-            this.#currentData = defaultData;
+        if (this._currentData === null)
+            this._currentData = defaultData;
 
-        return this.#currentData;
+        return this._currentData;
     }
 };
 

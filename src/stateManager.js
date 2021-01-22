@@ -27,7 +27,10 @@ const StateManager = class {
     async setData(newData) {
         if (this.#currentData === null) {
             this.#currentData = newData;
-            return this._recalculate();
+            return {
+                model: this.#currentData,
+                data: this._recalculate(),
+            };
         }
 
         const oldCurrency = this.#currentData.currency;
@@ -37,7 +40,10 @@ const StateManager = class {
         if (oldCurrency && oldCurrency !== newData.currency)
             await this._changeCurrency(oldCurrency);
 
-        return this._recalculate();
+        return {
+            model: this.#currentData,
+            data: this._recalculate(),
+        };
     }
 
     async getData(defaultData) {

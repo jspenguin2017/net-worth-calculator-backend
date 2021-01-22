@@ -6,11 +6,18 @@ const StateManager = class {
     #currentData = null;
 
     _recalculate() {
-        const value = {};
+        const sums = {};
         for (const key of StateManager.#ALL_KEYS)
-            value[key] = this.#currentData[key].map(x => x[1]).reduce((acc, curr) => acc + curr);
-        value.currency = this.#currentData.currency;
-        return value;
+            sums[key] = this.#currentData[key].map(x => x[1]).reduce((acc, curr) => acc + curr);
+
+        const totalAssets = sums.cashAndInvestments + sums.longTermAssets;
+        const totalLiabilities = sums.shortTermLiabilities + sums.longTermDebt;
+
+        return {
+            netWorth: totalAssets - totalLiabilities,
+            totalAssets,
+            totalLiabilities,
+        };
     }
 
     async _changeCurrency(oldCurrency) {

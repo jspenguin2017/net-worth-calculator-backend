@@ -5,7 +5,7 @@ const StateManager = class {
 
     _currentData = null;
 
-    _recalculate() {
+    async _recalculate() {
         const sums = {};
         for (const key of StateManager._ALL_KEYS)
             sums[key] = this._currentData[key].map(x => x[1]).reduce((acc, curr) => acc + curr);
@@ -17,6 +17,7 @@ const StateManager = class {
             netWorth: totalAssets - totalLiabilities,
             totalAssets,
             totalLiabilities,
+            exchangeRate: await currencyManager.convert('CAD', this._currentData.currency),
         };
     }
 
@@ -49,7 +50,7 @@ const StateManager = class {
 
         return {
             model: this._currentData,
-            data: this._recalculate(),
+            data: await this._recalculate(),
         };
     }
 

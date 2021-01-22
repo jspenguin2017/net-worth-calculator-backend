@@ -13,20 +13,13 @@ router.get('/', function(req, res, next) {
   res.redirect('http://localhost:3000/');
 });
 
-router.post('/get', function(req, res, next) {
-    console.log(req.body)
-
-    const data = stateManager.getData(req.body);
+router.post('/get', async function(req, res, next) {
+    const data = await stateManager.getData(req.body);
     res.json(data);
 });
 
-router.post('/setValue', function(req, res, next) {
-    const data = stateManager.setData(req.body);
-    res.json(data);
-});
-
-router.post('setCurrency', async function(req, res, next) {
-    const data = await stateManager.changeCurrency(req.body.currency);
+router.post('/set', async function(req, res, next) {
+    const data = await tateManager.setData(req.body);
     res.json(data);
 });
 

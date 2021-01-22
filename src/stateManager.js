@@ -13,31 +13,37 @@ const StateManager = class {
         return value;
     }
 
-    async changeCurrency(newCurrency) {
+    async _changeCurrency(oldCurrency) {
         if (this.#currentData === null)
             return null;
 
-        const exchangeRate = await currencyManager.convert(this.#currentData.currency, newCurrency);
+        const exchangeRate = await currencyManager.convert(oldCurrency, this.#currentData.currency);
 
-        this.#currentData.currency = newCurrency;
         for (const key of StateManager.#ALL_KEYS) {
             this.#currentData[key] = this.#currentData[key].map(entry => {
                 entry[1] *= exchangeRate;
                 return entry;
             });
         }
-
-        return this._recalculate();
     }
 
-    setData(newData) {
+    async setData(newData) {
+        let oldCurrency;
+
+        if (this.#currentData !== null)
+            oldCurrency = this.#currentData.currency;
+
         this.#currentData = newData;
+
+        if (oldCurrency && oldCurrency !== newData.currency)
+            await this._changeCurrency(oldCurrency);
+
         return this._recalculate();
     }
 
-    getData(defaultData) {
+    async getData(defaultData) {
         if (this.#currentData === null)
-            this.setData(defaultData);
+            this.#currentData = defaultData;
 
         return this.#currentData;
     }

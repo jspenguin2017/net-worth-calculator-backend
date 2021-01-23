@@ -9,10 +9,6 @@ router.use((req, res, next) => {
     next();
 });
 
-router.get('/', function(req, res, next) {
-  res.redirect('http://localhost:3000/');
-});
-
 router.post('/get', async function(req, res, next) {
     const data = await stateManager.getData(req.body);
     res.json(data);

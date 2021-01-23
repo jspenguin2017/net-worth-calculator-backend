@@ -37,7 +37,7 @@ const StateManager = class {
             this._currentData = newData;
             return {
                 model: this._currentData,
-                data: this._recalculate(),
+                data: await this._recalculate(),
             };
         }
 

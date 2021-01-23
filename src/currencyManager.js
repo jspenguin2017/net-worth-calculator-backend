@@ -61,7 +61,7 @@ const CurrencyManager = class {
 
     async convert(from, to) {
         try {
-            return this._convert(from, to);
+            return await this._convert(from, to);
         } catch (err) {
             console.log("Error when converting currency:");
             console.log(err);
